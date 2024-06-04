@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý thời gian</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="shortcut icon" href="./images/logo.png">
+    <link rel="stylesheet" href="/Student-Management-main/style.css">
+    <link rel="stylesheet" href="cv.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/images/logo.png" alt="">
+            <h2>H<span class="danger">Q</span>T</h2>
+        </div>
+        <div class="navbar">
+            <a href="/Student-Management-main/home.html">
+                <span class="material-icons-sharp">home</span>
+                <h3>Home</h3>
+            </a>
+            <a href="/timetable/timetable.html">
+                <span class="material-icons-sharp">today</span>
+                <h3>Thời gian biểu</h3>
+            </a>
+            <a href="/Student-Management-main/exam.html">
+                <span class="material-icons-sharp">grid_view</span>
+                <h3>Bài kiểm tra</h3>
+            </a>
+            <a href="/cv/cv.html" class="active">
+                <span class="material-icons-sharp">wysiwyg</span>
+                <h3>CV</h3>
+            </a>
+            <a href="/Student-Management-main/intro.html">
+                <span class="material-icons-sharp">info</span>
+                <h3>Giới thiệu</h3>
+            </a>
+            <a href="/faceid/face_id.html">
+                <span class="material-icons-sharp">face</span>
+                <h3>Nhận diện khuôn mặt</h3>
+            </a>
+        </div>
+        <div id="profile-btn" style="display: none;">
+            <span class="material-icons-sharp">person</span>
+        </div>
+        <div class="theme-toggler">
+            <span class="material-icons-sharp active">light_mode</span>
+            <span class="material-icons-sharp">dark_mode</span>
+        </div>
+        
+        <div>
+            <div class="menu-btn" onclick="toggleMenu()" style="font-size: 25px;">☰</div>
+
+            <!-- Menu -->
+            <div id="myMenu" class="menu">
+                <a href="#" class="note-button">
+                    <span class="material-icons-sharp">note</span>
+                    <h3>Note</h3>
+                </a>
+                <a href="https://tuyendung.topcv.vn/" target="_blank">
+                    <span class="material-icons-sharp">work</span>
+                    <h3>Tìm việc làm</h3>
+                </a>
+                <a href="https://github.com/hoanghelloworld/Student-Management/" target = "_blank">
+                    <span class="material-icons-sharp">code</span>
+                    <h3>Github</h3>
+                </a>
+                <a href="#" onclick="openContactBox()">
+                    <span class="material-icons-sharp">contact_mail</span>
+                    <h3>Contact</h3>
+                </a>                
+                <a href="#" id = "logout">
+                    <span class="material-icons-sharp">exit_to_app</span>
+                    <h3>Đăng xuất</h3>
+                </a>
+            </div>
+
+            <div id ="contactBox" class="wrapper">
+                
+                <div class="top">
+                    <span class="close-btn" onclick="closeContactBox()">&times;</span>
+                    <i class="fas fa-envelope-open-text"></i>
+
+                </div>
+                <div class="bottom">
+                  <div class="info">
+                    Your comments are our motivation
+                  </div>
+                  <form method="post" action="" name="contact-form">
+                    <input type="hidden" name="email" id="emailInput">
+                    <div class="input-box">
+                      <input type="text" name="nhan_xet" placeholder="Message" required>
+                    </div>
+                    <div class="input-box">
+                        <input id = "pointInput" type="text" name="diem" placeholder="Point" required>
+                      </div>
+                    <div class="input-box">
+                      <input type="submit" value="Sent">
+                    </div>
+                  </form>
+                  
+                </div>
+            </div>
+
+            <div class="note-box">
+                <div class="top-note">
+                    <span class="close-btn-note" onclick="closeNoteBox()">&times;</span>
+                </div>
+                <div class="content-note">
+                    <h2>My Notes</h2>
+                    <textarea id="noteInput" placeholder="Enter your note..." oninput="updateMarquee()" ></textarea>
+                </div>
+            </div>
+
+            <div id="success-message" class="success-message">Đã gửi thành công!</div>
+
+        </div>
+
+    </header>
+    <div class="space" style="color: #fff">
+        <button></button>
+    </div>
+    <div class="container">
+        <div class="avatar">
+            <!-- Thay đổi src của ảnh để hiển thị ảnh người dùng đã tải lên -->
+            <img id="avatar-image" src="placeholder.jpg" alt="">
+            <!-- Thêm phần tải lên ảnh -->
+            <input type="file" id="avatar-input" accept="image/*">
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var avatarInput = document.getElementById('avatar-input');
+                var avatarImage = document.getElementById('avatar-image');
+
+                avatarInput.addEventListener('change', function(event) {
+                    var file = event.target.files[0];
+                    if (file) {
+                        var reader = new FileReader();
+                            reader.onload = function(event) {
+                            avatarImage.src = event.target.result;
+                            avatarImage.style.display = 'block';
+                            avatarImage.style.opacity = '1';
+                            avatarImage.nextElementSibling.style.display = 'none';
+                            document.querySelector('.avatar').classList.add('hide-text'); 
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        avatarImage.src = 'placeholder.jpg';
+                        avatarImage.style.display = 'block';
+                        avatarImage.style.opacity = '0.5';
+                        avatarImage.nextElementSibling.style.display = 'block';
+                        document.querySelector('.avatar').classList.remove('hide-text');
+                    }
+                });
+            });
+        </script>
+        <div class="name">
+            <h1><input type="text" id="input-name" placeholder="Your Name"></h1>
+            <div class="specialize">Frond-End Developer</div>
+            <ul class="contact">
+                <li>
+                    <span>P</span> <input type="tel" id="input-phone" placeholder="Your Phone Number">
+                </li>
+                <li>
+                    <span>E</span> <input type="email" id="input-email" placeholder="Your Email">
+                </li>
+                <li>
+                    <span>W</span> <input type="web" id="input-website" placeholder="Your Website">
+                </li>
+            </ul>
+        </div>
+        <div class="info">
+            <ul >
+                <li contenteditable="true">From City - Country</li>
+                <li contenteditable="true">01/01/2000</li>
+                <li contenteditable="true">AAAA University</li>
+            </ul>
+        </div>
+        <div class="intro">
+            <h2>INTRODUCE MYSELF</h2>
+            <li>
+                <textarea type="input-text" cols="70" rows="6" maxlength="400" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit eligendi omnis quasi dolores modi eius aliquam ipsum soluta, dolore tenetur excepturi praesentium porro alias itaque enim labore qui necessitatibus molestias hic cum deserunt ab! Illum sed eveniet distinctio, alias sunt repudiandae labore a dolorum tenetur? Harum deleniti mollitia odio neque."></textarea>
+            </li>
+        </div>    
+        <div class="experience">
+         <h2>EXPERIENCE</h2>  
+         <div class="item">
+             <h4>Frond-end Developer</h4>
+             <div class="time">
+                <span><input type="year" placeholder="2023-2024"></span>
+                <span><input type="company" placeholder="ABCD company "></span>
+             </div>
+             <div class="des">
+                <textarea type="exp" placeholder="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium officia nobis quas excepturi consectetur quidem quia est neque doloremque."></textarea>
+             </div>
+         </div>
+ 
+            <div class="item">
+                <h4>Student</h4>
+                <div class="time">
+                    <span><input type="year" placeholder="2023-2024"></span>
+                    <span><input type="company" placeholder="ABCD University"></span>
+                </div>
+                <div class="des">
+                    <textarea type = "exp" placeholder="Lorem, ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium officia nobis quas excepturi consectetur quidem quia est neque doloremque."></textarea>
+                </div>
+            </div>
+            <h2 class="skills">
+                SKILLS
+            </h2>
+             <ul>
+                 <li><input type="company" placeholder="HTML"></li>
+                 <li><input type="company" placeholder="CSS"></li>
+                 <li><input type="company" placeholder="Bootstrap"></li>
+                 <li><input type="company" placeholder="Javascript"></li>
+                 <li><input type="company" placeholder="PHP"></li>
+                 <li><input type="company" placeholder="MySql"></li>
+                 <li><input type="company" placeholder="Git"></li>
+                 <li><input type="company" placeholder="Laravel"></li>
+             </ul>
+ 
+        </div>
+        <div class="project">
+         <h2>PROJECTS</h2>
+         <div class="item">
+             <h4><input type="prj" placeholder="Website shopping"></h4>
+             <div class="time">
+                 <input type="yearl" placeholder="2022">
+             </div>
+             <div class="web">
+                 <input type="web" placeholder="www.lundevweb.com">
+             </div>
+             <div class="location">
+                 Frond-end Developer
+             </div>
+             <div class="des">
+                 <textarea type="input-text" rows="3" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto consequatur amet sed, est eum facilis repellendus atque perspiciatis iste porro nobis autem explicabo expedita fugiat nostrum. Eveniet eum autem culpa!"></textarea>
+                 <ul>
+                     <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolordolores."></textarea></li>
+                     <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur, dolores."></textarea></li>
+                     <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur dolores."></textarea></li>
+                 </ul>
+             </div>
+         </div>
+ 
+         <div class="item">
+            <h4><input type="prj" placeholder="Website shopping"></h4>
+            <div class="time">
+                <input type="yearl" placeholder="2022">
+            </div>
+            <div class="web">
+                <input type="web" placeholder="www.lundevweb.com">
+            </div>
+            <div class="location">
+                Frond-end Developer
+            </div>
+            <div class="des">
+                <textarea type="input-text" rows="3" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto consequatur amet sed, est eum facilis repellendus atque perspiciatis iste porro nobis autem explicabo expedita fugiat nostrum. Eveniet eum autem culpa!"></textarea>
+                <ul>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolordolores."></textarea></li>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur, dolores."></textarea></li>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur dolores."></textarea></li>
+                </ul>
+            </div>
+        </div>
+ 
+        <div class="item">
+            <h4><input type="prj" placeholder="Website shopping"></h4>
+            <div class="time">
+                <input type="yearl" placeholder="2022">
+            </div>
+            <div class="web">
+                <input type="web" placeholder="www.lundevweb.com">
+            </div>
+            <div class="location">
+                Frond-end Developer
+            </div>
+            <div class="des">
+                <textarea type="input-text" rows="3" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto consequatur amet sed, est eum facilis repellendus atque perspiciatis iste porro nobis autem explicabo expedita fugiat nostrum. Eveniet eum autem culpa!"></textarea>
+                <ul>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolordolores."></textarea></li>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consequuntur, dolores."></textarea></li>
+                    <li><textarea type="input-text" rows="1" cols="70" placeholder="Lorem ipsum dolor sit amet consectetur dolores."></textarea></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- thẻ đóng lớp container -->
+    </div> 
+    <!-- <div class="space">
+        <button></button>
+    </div> -->
+    <div class="export">
+        <button id="export-btn">Xuất PDF</button>
+    </div>
+    <script>
+        window.onload = function () {
+        const exportBtn = document.getElementById('export-btn');
+        const container = document.querySelector('.container');
+
+        exportBtn.addEventListener('click', function () {
+            html2canvas(container, {scrollY: -window.scrollY}).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF();
+                pdf.addImage(imgData, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+                pdf.save('CV.pdf');
+                });
+            });
+        };
+    </script>
+</body>
+
+<script src="/Student-Management-main/menu.js"></script>
+<script src="/Student-Management-main/app.js"></script>
+
+</html>
